@@ -6,9 +6,12 @@ Unified STT/TTS MCP-Server — speech-to-text via WhisperX, text-to-speech via C
 
 | Tool | Description |
 |---|---|
-| `speech__record` | Record audio from USB microphone (N seconds) |
-| `speech__transcribe` | Transcribe audio file via WhisperX |
+| `speech__status` | Service status (mic, STT, TTS, state) |
+| `speech__record_start` / `speech__record_stop` | Start recording from USB microphone / stop and return the audio file path |
+| `speech__transcribe` | Transcribe audio file via WhisperX (records first if no path given) |
+| `speech__transcribe_telegram` | Download and transcribe a Telegram voice message by `file_id` |
 | `speech__tts` | Text-to-speech via TTS endpoint |
+| `speech__listen` | One-shot: record N seconds, transcribe, return text |
 
 ## Setup
 
