@@ -1,0 +1,2 @@
+# mcp 2.x hat kein mcp.server.fastmcp mehr in der bisherigen Form; Server laufen auf 1.x (NG-Bullseye/project-manager-agent#83)
+mcp<2
