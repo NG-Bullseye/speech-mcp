@@ -18,7 +18,7 @@ Unified STT/TTS MCP-Server — speech-to-text via WhisperX, text-to-speech via C
 ```bash
 cd speech-mcp
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install mcp httpx starlette uvicorn
 cp .env.example .env   # adjust WHISPERX_URL / TTS_URL / MIC_DEVICE
 ```
 
@@ -48,10 +48,10 @@ All config via environment variables (see `.env.example`):
 
 | Variable | Default | Description |
 |---|---|---|
-| `WHISPERX_URL` | `localhost:48001` | WhisperX service endpoint |
-| `TTS_URL` | `localhost:8188` | TTS service endpoint |
+| `WHISPERX_URL` | `http://192.168.1.225:48001` | WhisperX service endpoint |
+| `TTS_URL` | `http://172.20.0.6:8188` | TTS service endpoint |
 | `MIC_DEVICE` | `hw:1,0` | ALSA microphone device |
-| `RECORD_DIR` | `/tmp/speech-mcp-recordings` | Recording scratch directory |
+| `RECORD_DIR` | `/tmp/speech-mcp` | Recording scratch directory |
 
 ## License
 
