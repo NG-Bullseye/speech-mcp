@@ -2,7 +2,7 @@
 """
 Speech MCP Server - Unified STT/TTS interface for AIOT 4.0
 Port: 8902
-Backends: WhisperX (STT), Qwen3/Voicebox (TTS)
+Backends: speech-engine POST /transcribe (STT, pma#209), Qwen3/Voicebox (TTS)
 Input: Athom USB Mic (hw:1,0) or file upload
 """
 
@@ -20,7 +20,8 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
 # Config
-WHISPERX_URL = os.environ.get("WHISPERX_URL", "http://192.168.1.225:48001")
+# STT = speech-engine POST /transcribe (pma#209, whisperx :48001 retired)
+SPEECH_ENGINE_URL = os.environ.get("SPEECH_ENGINE_URL", "http://192.168.1.225:8770")
 TTS_URL = os.environ.get("TTS_URL", "http://172.20.0.6:8188")
 MIC_DEVICE = os.environ.get("MIC_DEVICE", "hw:1,0")
 MIC_RATE = int(os.environ.get("MIC_RATE", "44100"))
@@ -72,7 +73,7 @@ async def list_tools():
         ),
         Tool(
             name="speech__transcribe",
-            description="Transcribe audio file via WhisperX. Accepts file path or records+transcribes if no path given.",
+            description="Transcribe audio file via the speech-engine. Accepts file path or records+transcribes if no path given.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -157,11 +158,11 @@ async def call_tool(name: str, arguments: dict):
 
 
 async def _handle_status():
-    # Check WhisperX
+    # Check speech-engine (STT)
     stt_ok = False
     try:
         async with httpx.AsyncClient(timeout=5) as c:
-            r = await c.get(f"{WHISPERX_URL}/health")
+            r = await c.get(f"{SPEECH_ENGINE_URL}/health")
             stt_ok = r.status_code == 200
     except Exception:
         pass
@@ -180,7 +181,7 @@ async def _handle_status():
     status = {
         "state": _state,
         "mic": {"device": MIC_DEVICE, "online": mic_ok, "rate": MIC_RATE, "channels": MIC_CHANNELS},
-        "stt": {"url": WHISPERX_URL, "online": stt_ok},
+        "stt": {"url": SPEECH_ENGINE_URL, "online": stt_ok},
         "tts": {"url": TTS_URL},
         "record_dir": str(RECORD_DIR),
     }
@@ -261,7 +262,7 @@ async def _record_sync(duration: int) -> Path:
 
 
 async def _transcribe_file(file_path: Path) -> str:
-    """Send audio file to WhisperX, return transcript."""
+    """Send audio file to the speech-engine POST /transcribe, return transcript."""
     _set_state("PROCESSING")
     try:
         audio_data = file_path.read_bytes()
@@ -277,7 +278,7 @@ async def _transcribe_file(file_path: Path) -> str:
 
         async with httpx.AsyncClient(timeout=60) as client:
             r = await client.post(
-                f"{WHISPERX_URL}/transcribe",
+                f"{SPEECH_ENGINE_URL}/transcribe",
                 content=body,
                 headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
             )

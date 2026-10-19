@@ -28,7 +28,8 @@ from starlette.responses import JSONResponse, FileResponse
 from starlette.routing import Route
 
 # Config
-WHISPERX_URL = os.environ.get("WHISPERX_URL", "http://192.168.1.225:48001")
+# STT = speech-engine POST /transcribe (pma#209, whisperx :48001 retired)
+SPEECH_ENGINE_URL = os.environ.get("SPEECH_ENGINE_URL", "http://192.168.1.225:8770")
 TTS_URL = os.environ.get("TTS_URL", "http://172.20.0.6:8188")
 MIC_DEVICE = os.environ.get("MIC_DEVICE", "hw:1,0")
 MIC_RATE = int(os.environ.get("MIC_RATE", "44100"))
@@ -45,10 +46,10 @@ _recording_file = None
 _state = "IDLE"
 
 
-async def _check_whisperx() -> bool:
+async def _check_stt() -> bool:
     try:
         async with httpx.AsyncClient(timeout=3) as c:
-            r = await c.get(f"{WHISPERX_URL}/health")
+            r = await c.get(f"{SPEECH_ENGINE_URL}/health")
             return r.status_code == 200
     except Exception:
         return False
@@ -90,7 +91,7 @@ async def _transcribe(audio_data: bytes, filename: str = "audio.wav") -> str:
 
     async with httpx.AsyncClient(timeout=60) as client:
         r = await client.post(
-            f"{WHISPERX_URL}/transcribe",
+            f"{SPEECH_ENGINE_URL}/transcribe",
             content=body,
             headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
         )
@@ -110,12 +111,12 @@ async def health(request: Request):
 
 
 async def status(request: Request):
-    stt_ok = await _check_whisperx()
+    stt_ok = await _check_stt()
     mic_ok = await _check_mic()
     return JSONResponse({
         "state": _state,
         "mic": {"device": MIC_DEVICE, "online": mic_ok},
-        "stt": {"url": WHISPERX_URL, "online": stt_ok},
+        "stt": {"url": SPEECH_ENGINE_URL, "online": stt_ok},
         "tts": {"url": TTS_URL},
     })
 

@@ -1,6 +1,6 @@
 # speech-mcp
 
-Unified STT/TTS MCP-Server — speech-to-text via WhisperX, text-to-speech via ComfyUI/Qwen3, plus optional HTTP wrapper.
+Unified STT/TTS MCP-Server — speech-to-text via the speech-engine (`POST /transcribe`), text-to-speech via ComfyUI/Qwen3, plus optional HTTP wrapper.
 
 ## Tools
 
@@ -8,7 +8,7 @@ Unified STT/TTS MCP-Server — speech-to-text via WhisperX, text-to-speech via C
 |---|---|
 | `speech__status` | Service status (mic, STT, TTS, state) |
 | `speech__record_start` / `speech__record_stop` | Start recording from USB microphone / stop and return the audio file path |
-| `speech__transcribe` | Transcribe audio file via WhisperX (records first if no path given) |
+| `speech__transcribe` | Transcribe audio file via the speech-engine (`POST /transcribe`) (records first if no path given) |
 | `speech__transcribe_telegram` | Download and transcribe a Telegram voice message by `file_id` |
 | `speech__tts` | Text-to-speech via TTS endpoint |
 | `speech__listen` | One-shot: record N seconds, transcribe, return text |
@@ -19,7 +19,7 @@ Unified STT/TTS MCP-Server — speech-to-text via WhisperX, text-to-speech via C
 cd speech-mcp
 python3 -m venv .venv
 .venv/bin/pip install mcp httpx starlette uvicorn
-cp .env.example .env   # adjust WHISPERX_URL / TTS_URL / MIC_DEVICE
+cp .env.example .env   # adjust SPEECH_ENGINE_URL / TTS_URL / MIC_DEVICE
 ```
 
 ## MCP registration
@@ -48,7 +48,7 @@ All config via environment variables (see `.env.example`):
 
 | Variable | Default | Description |
 |---|---|---|
-| `WHISPERX_URL` | `http://192.168.1.225:48001` | WhisperX service endpoint |
+| `SPEECH_ENGINE_URL` | `http://192.168.1.225:8770` | speech-engine base URL (STT `/transcribe`, health `/health`) |
 | `TTS_URL` | `http://172.20.0.6:8188` | TTS service endpoint |
 | `MIC_DEVICE` | `hw:1,0` | ALSA microphone device |
 | `RECORD_DIR` | `/tmp/speech-mcp` | Recording scratch directory |
