@@ -29,3 +29,14 @@ Der Hauptflow nimmt über ALSA vom USB-Mikrofon auf, schickt das Audio an die sp
 ## Standard: Deep Modules + Flow
 
 Kanon: `~/repos/speech-engine/ARCHITECTURE.md` § Standard (R1–R5).
+
+<!-- services:begin -->
+## Aktive Services
+
+> Stand 2026-11-17 18:27 · generiert von `~/repos/maintenance/repo_inventory.py` (Skill `repo-inventar`), nicht von Hand editieren
+
+| Art | Name | Wofür | Zustand | Zuletzt benutzt |
+|---|---|---|---|---|
+| mcp | `speech` | MCP-Server `speech` (stdio) | registriert | — |
+
+<!-- services:end -->
